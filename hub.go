@@ -100,12 +100,10 @@ func (h *Hub) DoesIDExist(t string, id string) bool {
 }
 
 func (h *Hub) GenUID(group string) string {
-	h.CMutex.Lock()
 	id := uuid.New().String()
 	for h.DoesIDExist(group, id) {
 		id = uuid.New().String()
 	}
-	h.CMutex.Unlock()
 	return id
 }
 
@@ -117,6 +115,7 @@ func (h *Hub) AddToPool(t string, id string, channel *Channel) {
 }
 
 func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer TransportationLayer) {
+	h.CMutex.Lock()
 	ctx.Cha = NewChannel("", h, "", conn, transLayer)
 	ctx.Cha.ID = ctx.ID
 	ctx.Cha.GroupName = ctx.Group
@@ -128,6 +127,7 @@ func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer Transportation
 
 	go ctx.Cha.Reader()
 	go ctx.Cha.Writer()
+	h.CMutex.Unlock()
 }
 
 func (h *Hub) BroadcastToAll(msg []byte) {
