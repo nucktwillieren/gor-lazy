@@ -81,6 +81,7 @@ func (c *Channel) Transport(ctx *Context) *Context {
 
 	ctx, err := c.TransportationLayer(ctx)
 	if err != nil {
+		log.Println("Transportation Error: ", err.Error())
 		return ctx
 	}
 
