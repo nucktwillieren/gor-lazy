@@ -118,7 +118,7 @@ func (h *Hub) AddToPool(t string, id string, tun *Channel) {
 
 func (h *Hub) Join(conn *websocket.Conn, ctx *Context) {
 
-	ctx.Tun = NewTunnel("", h, "", conn)
+	ctx.Tun = NewChannel("", h, "", conn)
 	ctx.Tun.ID = ctx.ID
 	ctx.Tun.GroupName = ctx.Group
 	h.AddToPool(ctx.Group, ctx.ID, ctx.Tun)

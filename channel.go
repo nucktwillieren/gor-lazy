@@ -134,13 +134,13 @@ func (c *Channel) Writer() {
 	}
 }
 
-func NewTunnel(id string, hub *Hub, groupName string, conn *websocket.Conn) (tun *Channel) {
-	tun = &Channel{
+func NewChannel(id string, hub *Hub, groupName string, conn *websocket.Conn) *Channel {
+	tun := Channel{
 		Hub:       hub,
 		ID:        id,
 		GroupName: groupName,
 		Conn:      conn,
 		SendChan:  make(chan []byte),
 	}
-	return
+	return &tun
 }
