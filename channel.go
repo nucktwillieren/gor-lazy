@@ -15,7 +15,7 @@ var (
 var wsupgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	Subprotocols:    []string{"device", "user"},
+	Subprotocols:    []string{},
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
