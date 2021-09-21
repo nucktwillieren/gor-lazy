@@ -1,4 +1,4 @@
-module github.com/nucktwillieren/gor-lazy
+module github.com/nucktwillieren/gorlazy
 
 go 1.16
 

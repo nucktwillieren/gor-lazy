@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	ws "github.com/nucktwillieren/gor-lazy"
+	ws "github.com/nucktwillieren/gorlazy"
 )
 
 func init() {

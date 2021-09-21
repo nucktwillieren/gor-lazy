@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"github.com/nucktwillieren/gor-lazy/cache"
+	"github.com/nucktwillieren/gorlazy/cache"
 )
 
 type Hub struct {
