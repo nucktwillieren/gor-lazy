@@ -14,12 +14,19 @@ import (
 func init() {
 }
 
+func newEchoTransLayer() ws.TransportationLayer {
+	return func(ctx *ws.Context) (*ws.Context, error) {
+		ctx.AddSingleTargetPayload(ctx.Group, ctx.ID, ctx.Message)
+		return ctx, nil
+	}
+}
+
 func main() {
 	hub := ws.NewHub("test")
 	r := mux.NewRouter()
 
 	r.HandleFunc("/ws", func(rw http.ResponseWriter, r *http.Request) {
-		ws.CreateConnection(rw, r, hub)
+		ws.CreateConnection(rw, r, hub, newEchoTransLayer())
 	})
 
 	err := r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {

@@ -33,7 +33,7 @@ type Context struct {
 	SecWebSocketProtocol string
 	Group                string
 	ID                   string
-	Message              string
+	Message              []byte
 
 	TransportationPayloads []*TransportationPayload
 }
@@ -77,7 +77,7 @@ func Upgrading(w http.ResponseWriter, r *http.Request, ctx *Context) *Context {
 	return ctx
 }
 
-func CreateConnection(w http.ResponseWriter, r *http.Request, hub *Hub) *Context {
+func CreateConnection(w http.ResponseWriter, r *http.Request, hub *Hub, transLayer TransportationLayer) *Context {
 	secWebSocketProtocol := r.Header.Get("Sec-WebSocket-Protocol")
 	ctx := &Context{
 		SecWebSocketProtocol: secWebSocketProtocol,
@@ -85,7 +85,7 @@ func CreateConnection(w http.ResponseWriter, r *http.Request, hub *Hub) *Context
 
 	ctx = Upgrading(w, r, ctx)
 
-	hub.Join(ctx.Conn, ctx)
+	hub.Join(ctx.Conn, ctx, transLayer)
 
 	return ctx
 }
@@ -116,8 +116,8 @@ func (h *Hub) AddToPool(t string, id string, channel *Channel) {
 	h.ConnectionPool[t][id] = channel
 }
 
-func (h *Hub) Join(conn *websocket.Conn, ctx *Context) {
-	ctx.Cha = NewChannel("", h, "", conn)
+func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer TransportationLayer) {
+	ctx.Cha = NewChannel("", h, "", conn, transLayer)
 	ctx.Cha.ID = ctx.ID
 	ctx.Cha.GroupName = ctx.Group
 	h.AddToPool(ctx.Group, ctx.ID, ctx.Cha)
@@ -148,7 +148,7 @@ func (h *Hub) SendToGroup(groupName string, msg []byte) {
 	}
 }
 
-func (h *Hub) SendToTun(groupName string, ID string, msg []byte) {
+func (h *Hub) SendToChannel(groupName string, ID string, msg []byte) {
 	if client := h.ConnectionPool[groupName][ID]; client != nil {
 		h.Send(client, msg)
 	}

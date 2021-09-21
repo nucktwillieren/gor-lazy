@@ -65,9 +65,10 @@ func (c *Channel) Reader() {
 		log.Println("Source Bytes(String): ", string(msg))
 
 		ctx := Context{
-			ID:    c.ID,
-			Cha:   c,
-			Group: c.GroupName,
+			ID:      c.ID,
+			Cha:     c,
+			Group:   c.GroupName,
+			Message: msg,
 		}
 		c.Transport(&ctx)
 	}
@@ -90,8 +91,8 @@ func (c *Channel) Transport(ctx *Context) *Context {
 			c.Hub.BroadcastToAll(transportation.Message)
 		case "group":
 			c.Hub.SendToGroup(transportation.TargetGroup, transportation.Message)
-		case "tun":
-			c.Hub.SendToTun(transportation.TargetGroup, transportation.TargetID, transportation.Message)
+		case "channel":
+			c.Hub.SendToChannel(transportation.TargetGroup, transportation.TargetID, transportation.Message)
 		}
 		log.Println("Data Transportation(", transportation.Class, "): ", ctx)
 	}
@@ -134,13 +135,14 @@ func (c *Channel) Writer() {
 	}
 }
 
-func NewChannel(id string, hub *Hub, groupName string, conn *websocket.Conn) *Channel {
+func NewChannel(id string, hub *Hub, groupName string, conn *websocket.Conn, transLayer TransportationLayer) *Channel {
 	tun := Channel{
-		Hub:       hub,
-		ID:        id,
-		GroupName: groupName,
-		Conn:      conn,
-		SendChan:  make(chan []byte),
+		Hub:                 hub,
+		ID:                  id,
+		GroupName:           groupName,
+		Conn:                conn,
+		SendChan:            make(chan []byte),
+		TransportationLayer: transLayer,
 	}
 	return &tun
 }

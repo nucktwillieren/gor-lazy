@@ -45,7 +45,7 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
-			fmt.Print(string(msg), ",")
+			fmt.Println(string(msg), ",")
 		}
 	}()
 
