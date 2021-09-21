@@ -67,7 +67,7 @@ type TransportationPayload struct {
 }
 
 func Upgrading(w http.ResponseWriter, r *http.Request, ctx *Context) *Context {
-	log.Println("Upgrading Protocol")
+	//log.Println("Upgrading Protocol")
 	conn, err := wsupgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("Failed to set websocket upgrade: ", err)
@@ -108,18 +108,15 @@ func (h *Hub) GenUID(group string) string {
 }
 
 func (h *Hub) AddToPool(t string, id string, channel *Channel) {
-	h.CMutex.Lock()
 	if h.ConnectionPool[t] == nil {
 		h.ConnectionPool[t] = make(map[string]*Channel)
 	}
-	h.CMutex.Unlock()
 	h.ConnectionPool[t][id] = channel
 }
 
 func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer TransportationLayer) {
-	ctx.Cha = NewChannel("", h, "", conn, transLayer)
-	ctx.Cha.ID = ctx.ID
-	ctx.Cha.GroupName = ctx.Group
+	h.CMutex.Lock()
+	ctx.Cha = NewChannel(h.GenUID("test"), h, "test", conn, transLayer)
 	h.AddToPool(ctx.Group, ctx.ID, ctx.Cha)
 
 	if ctx.Cha == nil {
@@ -128,6 +125,7 @@ func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer Transportation
 
 	go ctx.Cha.Reader()
 	go ctx.Cha.Writer()
+	h.CMutex.Unlock()
 }
 
 func (h *Hub) BroadcastToAll(msg []byte) {

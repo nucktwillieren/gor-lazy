@@ -53,16 +53,16 @@ func (c *Channel) Reader() {
 			}
 			return
 		}
-		log.Println(
-			"Websocket Package From: ",
-			c.Conn.LocalAddr().String(),
-			c.Conn.LocalAddr().Network(),
-			c.Conn.RemoteAddr().String(),
-			c.Conn.RemoteAddr().Network(),
-		)
+		//log.Println(
+		//	"Websocket Package From: ",
+		//	c.Conn.LocalAddr().String(),
+		//	c.Conn.LocalAddr().Network(),
+		//	c.Conn.RemoteAddr().String(),
+		//	c.Conn.RemoteAddr().Network(),
+		//)
 		//log.Println("Source Bytes(Raw): ", msg)
 		//log.Println("Source Bytes(Hex): ", hex.EncodeToString(msg))
-		log.Println("Source Bytes(String): ", string(msg))
+		//log.Println("Source Bytes(String): ", string(msg))
 
 		ctx := Context{
 			ID:      c.ID,
@@ -94,7 +94,7 @@ func (c *Channel) Transport(ctx *Context) *Context {
 		case "channel":
 			c.Hub.SendToChannel(transportation.TargetGroup, transportation.TargetID, transportation.Message)
 		}
-		log.Println("Data Transportation(", transportation.Class, "): ", ctx)
+		log.Println("Data Transportation(", transportation.Class, "): ", ctx.ID)
 	}
 
 	return ctx
@@ -127,7 +127,7 @@ func (c *Channel) Writer() {
 			w.Write(newline)
 			w.Write(<-c.SendChan)
 		}
-		log.Println("Writer Send(String): ", string(message))
+		//log.Println("Writer Send(String): ", string(message))
 
 		if err := w.Close(); err != nil {
 			return
