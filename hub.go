@@ -28,7 +28,7 @@ type Hub struct {
 
 type Context struct {
 	Conn *websocket.Conn
-	Tun  *Channel
+	Cha  *Channel
 
 	SecWebSocketProtocol string
 	Group                string
@@ -48,7 +48,7 @@ func (ctx *Context) AddTranspotationPayload(class string, group string, target s
 }
 
 func (ctx *Context) AddSingleTargetPayload(group, target string, message []byte) {
-	ctx.AddTranspotationPayload("tun", group, target, message)
+	ctx.AddTranspotationPayload("channel", group, target, message)
 }
 
 func (ctx *Context) AddGroupTargetPayload(group string, message []byte) {
@@ -109,26 +109,25 @@ func (h *Hub) GenUID(group string) string {
 	return id
 }
 
-func (h *Hub) AddToPool(t string, id string, tun *Channel) {
+func (h *Hub) AddToPool(t string, id string, channel *Channel) {
 	if h.ConnectionPool[t] == nil {
 		h.ConnectionPool[t] = make(map[string]*Channel)
 	}
-	h.ConnectionPool[t][id] = tun
+	h.ConnectionPool[t][id] = channel
 }
 
 func (h *Hub) Join(conn *websocket.Conn, ctx *Context) {
+	ctx.Cha = NewChannel("", h, "", conn)
+	ctx.Cha.ID = ctx.ID
+	ctx.Cha.GroupName = ctx.Group
+	h.AddToPool(ctx.Group, ctx.ID, ctx.Cha)
 
-	ctx.Tun = NewChannel("", h, "", conn)
-	ctx.Tun.ID = ctx.ID
-	ctx.Tun.GroupName = ctx.Group
-	h.AddToPool(ctx.Group, ctx.ID, ctx.Tun)
-
-	if ctx.Tun == nil {
+	if ctx.Cha == nil {
 		return
 	}
 
-	go ctx.Tun.Reader()
-	go ctx.Tun.Writer()
+	go ctx.Cha.Reader()
+	go ctx.Cha.Writer()
 }
 
 func (h *Hub) BroadcastToAll(msg []byte) {
@@ -168,10 +167,10 @@ func (h *Hub) Send(client *Channel, msg []byte) (closed bool) {
 }
 
 func (h *Hub) Start() {
-	for tun := range h.Unregister {
-		//if _, ok := h.ConnectionPool[tun.GroupName][tun.ID]; ok {
-		SafeClose(tun.SendChan)
-		delete(h.ConnectionPool[tun.GroupName], tun.ID)
+	for channel := range h.Unregister {
+		//if _, ok := h.ConnectionPool[channel.GroupName][channel.ID]; ok {
+		SafeClose(channel.SendChan)
+		delete(h.ConnectionPool[channel.GroupName], channel.ID)
 		//}
 	}
 }

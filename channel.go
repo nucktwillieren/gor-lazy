@@ -66,7 +66,7 @@ func (c *Channel) Reader() {
 
 		ctx := Context{
 			ID:    c.ID,
-			Tun:   c,
+			Cha:   c,
 			Group: c.GroupName,
 		}
 		c.Transport(&ctx)
