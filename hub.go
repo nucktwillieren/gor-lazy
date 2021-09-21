@@ -90,7 +90,7 @@ func CreateConnection(w http.ResponseWriter, r *http.Request, hub *Hub) *Context
 	return ctx
 }
 
-func (h *Hub) DoseIDExist(t string, id string) bool {
+func (h *Hub) DoesIDExist(t string, id string) bool {
 	for key := range h.ConnectionPool[t] {
 		if id == key {
 			return true
@@ -102,7 +102,7 @@ func (h *Hub) DoseIDExist(t string, id string) bool {
 func (h *Hub) GenUID(group string) string {
 	h.CMutex.Lock()
 	id := uuid.New().String()
-	for h.DoseIDExist(group, id) {
+	for h.DoesIDExist(group, id) {
 		id = uuid.New().String()
 	}
 	h.CMutex.Unlock()
