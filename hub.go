@@ -116,15 +116,13 @@ func (h *Hub) AddToPool(t string, id string, channel *Channel) {
 
 func (h *Hub) Join(conn *websocket.Conn, ctx *Context, transLayer TransportationLayer) {
 	h.CMutex.Lock()
-	ctx.Cha = NewChannel(h.GenUID("test"), h, "test", conn, transLayer)
-	h.AddToPool(ctx.Group, ctx.ID, ctx.Cha)
+	cha := NewChannel(h.GenUID("test"), h, "test", conn, transLayer)
+	h.AddToPool(cha.GroupName, cha.ID, cha)
 
-	if ctx.Cha == nil {
-		return
-	}
+	ctx.Cha = cha
 
-	go ctx.Cha.Reader()
-	go ctx.Cha.Writer()
+	go cha.Reader()
+	go cha.Writer()
 	h.CMutex.Unlock()
 }
 

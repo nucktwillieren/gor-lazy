@@ -95,6 +95,7 @@ func (c *Channel) Transport(ctx *Context) *Context {
 		case "channel":
 			c.Hub.SendToChannel(transportation.TargetGroup, transportation.TargetID, transportation.Message)
 		}
+		log.Println(c.Hub.ConnectionPool)
 		log.Println("Data Transportation(", transportation.Class, "): ", ctx.ID)
 	}
 
