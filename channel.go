@@ -128,7 +128,7 @@ func (c *Channel) Writer() {
 			w.Write(newline)
 			w.Write(<-c.SendChan)
 		}
-		//log.Println("Writer Send(String): ", string(message))
+		log.Println("Writer Send(String): ", string(message))
 
 		if err := w.Close(); err != nil {
 			return
